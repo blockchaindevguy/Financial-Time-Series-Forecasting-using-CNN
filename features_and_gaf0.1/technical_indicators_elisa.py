@@ -10,6 +10,7 @@ from ta.trend import *
 from ta.volatility import *
 from ta.momentum import *
 from ta.volume import *
+from ta.others import *
 import numpy as np
 import pandas as pd
 
@@ -20,8 +21,8 @@ class TechnicalIndicator():
     
     
     def create_features(self):
-        # self.get_std(col_name="close")
-        # self.get_std(col_name="volume")
+        
+        self.get_dr()
         
         self.get_ppo(col_name="close")
         self.get_ppo(col_name="open")
@@ -73,12 +74,12 @@ class TechnicalIndicator():
         
         self.get_CMO(intervals=[10,15,20,25,30])
         
-
-    def get_std(self, col_name: str = "close"):
+        
+    def get_dr(self, close: str = "close"):  
         """
-        Standard Deviation
+        Daily Return
         """
-        self.df["std_{}".format(col_name)]=self.df[col_name].std()
+        self.df['daily_return'] = DailyReturnIndicator(self.df[close]).daily_return()
 
 
     def get_roc(self, col_name: str = "close", window: int = 12):
