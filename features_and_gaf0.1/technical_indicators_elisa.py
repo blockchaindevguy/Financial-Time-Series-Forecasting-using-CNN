@@ -19,60 +19,38 @@ class TechnicalIndicator():
     def __init__(self, df):
         self.df = df
     
-    
     def create_features(self):
         
-        self.get_dr()
+        self.get_dr() # daily return
         
-        self.get_ppo(col_name="close")
-        self.get_ppo(col_name="open")
+        self.get_ppo(col_name="close") # Percentage Price Oscillator, https://www.investopedia.com/terms/p/ppo.asp
+        self.get_ppo(col_name="open") # https://www.investopedia.com/terms/p/ppo.asp
+        self.get_MACD() # https://www.investopedia.com/terms/m/macd.asp
         
-        self.get_kst()
-        self.get_MACD()
+        self.get_kst() # KST Oscillator
         
-        for window in [4,8,12,16]:
+        for window in range(2,31):
             self.get_roc(window=window)
-        
-        for window in [8,14,20]:
             self.get_rsi(window=window)
-            
-        for window in [8,14,20]:
             self.get_mfi(window=window)
-        
-        for window in [10,20,30]:
             self.get_cmf(window=window)
-        
-        for window in [10,20,30]:
             self.get_dpo(window=window)
-            
-        for window in [6,12,18]:   
-            self.get_adx()
-        
-        for window in [5,9,13,19]:
+            self.get_adx(window=window)
             self.get_fi(window=window)
-        
-        for window in [8,14,20]:
             self.get_emv(window=window)
-        
-        for window in [10,15,20,25,30]:
             self.get_bb(window=window)
-        
-        for window in [8,14,20]:
             self.get_atr(window=window)
-        
-        for look_back in [8,14,20]:
-            self.get_williamR(look_back=look_back)
-        
-        for window in [4,6,8,10,12,14,16,18,20,36,50]:
+            self.get_williamR(look_back=window)
             self.get_sma(window=window)
             self.get_ema(window=window)
             self.get_wma(window=window)
             self.get_trix(window=window)
-        
-        for window in [10,15,20,25,30]:
             self.get_CCI(window=window)
+            self.get_so(window=window)
+            self.get_kc(window=window)
+            
         
-        self.get_CMO(intervals=[10,15,20,25,30])
+        self.get_CMO(intervals=np.arange(2,31))
         
         
     def get_dr(self, close: str = "close"):  
@@ -174,14 +152,14 @@ class TechnicalIndicator():
         Bollinger bands help determine whether prices are high or low on a relative basis.
         """
         indicator_bb = BollingerBands(self.df[close], window)
-        self.df['bb_bbm'] = indicator_bb.bollinger_mavg()
-        self.df['bb_bbh'] = indicator_bb.bollinger_hband()
-        self.df['bb_bbl'] = indicator_bb.bollinger_lband()
-        self.df['bb_bbhi'] = indicator_bb.bollinger_hband_indicator()
-        self.df['bb_bbli'] = indicator_bb.bollinger_lband_indicator()
-        self.df['bb_bbhi'] = indicator_bb.bollinger_hband()
-        self.df['bb_bbw'] = indicator_bb.bollinger_wband()
-        self.df['bb_bbp'] = indicator_bb.bollinger_pband()
+        self.df['bb_bbm_{}'.format(window)] = indicator_bb.bollinger_mavg()
+        self.df['bb_bbh_{}'.format(window)] = indicator_bb.bollinger_hband()
+        self.df['bb_bbl_{}'.format(window)] = indicator_bb.bollinger_lband()
+        self.df['bb_bbhi_{}'.format(window)] = indicator_bb.bollinger_hband_indicator()
+        self.df['bb_bbli_{}'.format(window)] = indicator_bb.bollinger_lband_indicator()
+        self.df['bb_bbhi_{}'.format(window)] = indicator_bb.bollinger_hband()
+        self.df['bb_bbw_{}'.format(window)] = indicator_bb.bollinger_wband()
+        self.df['bb_bbp_{}'.format(window)] = indicator_bb.bollinger_pband()
 
         
     def get_atr(self, high: str = "high", low: str = "low", close: str = "close", window: int = 14):
@@ -280,3 +258,21 @@ class TechnicalIndicator():
             self.df['cmo_' + str(period)] = np.nan
             res = diff.rolling(period).apply(calculate_CMO, args=(period,), raw=False)
             self.df['cmo_' + str(period)][1:] = res
+            
+            
+    def get_so(self, window: int=14):
+        indicator_so=StochasticOscillator(high=self.df["high"], low=self.df["low"], close=self.df["close"], window=window)
+        self.df['stoch_{}'.format(window)] = indicator_so.stoch()
+        self.df['stoch_signal_{}'.format(window)] = indicator_so.stoch_signal()
+    
+    def get_kc(self, window: int=14):
+        indicator_kc=KeltnerChannel(high=self.df["high"], low=self.df["low"], close=self.df["close"], window=window)
+        self.df['kc_hband_{}'.format(window)] = indicator_kc.keltner_channel_hband()
+        self.df['kc_hband_ind_{}'.format(window)] = indicator_kc.keltner_channel_hband_indicator()
+        self.df['kc_lband_{}'.format(window)] = indicator_kc.keltner_channel_lband()
+        self.df['kc_lband_ind_{}'.format(window)] = indicator_kc.keltner_channel_lband_indicator()
+        self.df['kc_mband_{}'.format(window)] = indicator_kc.keltner_channel_mband()
+        self.df['kc_pband_{}'.format(window)] = indicator_kc.keltner_channel_pband()
+        self.df['kc_wband_{}'.format(window)] = indicator_kc.keltner_channel_wband()
+        
+        
