@@ -58,3 +58,6 @@ def get_labels_daily(df, upper_lower_multipliers):
     labels.append(0)
     barriers_df['label'] = labels
     return barriers_df, barriers_df.label
+   
+   
+   barriers_df, labels = get_labels_daily(data, upper_lower_multipliers(2,2))
