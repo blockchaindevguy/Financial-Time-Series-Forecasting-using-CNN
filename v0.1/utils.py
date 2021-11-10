@@ -109,7 +109,7 @@ def plot(y, title, output_path, x=None):
         plt.savefig(output_path)
 
 
-def create_labels(df, col_name, window_size=11):  # TODO: check what this does, rewrite according to BAZEL
+def create_labels(df, col_name, window_size=11):  
     """
     Data is labeled as per the logic in research paper
     Label code : BUY => 1, SELL => 0, HOLD => 2
