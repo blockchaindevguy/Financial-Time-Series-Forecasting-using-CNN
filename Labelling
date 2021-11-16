@@ -55,9 +55,15 @@ def get_labels_daily(df, upper_lower_multipliers):
             labels.append(-1)  
         else: 
             labels.append(0)
+    
+        if barriers_df.high.iloc[i+1] >= barriers_df.top_barrier.iloc[i+1] and barriers_df.low.iloc[i+1] <= barriers_df.bottom_barrier.iloc[i+1]:
+            nr_double_labels += 1
+    
     labels.append(0)
+    perc_double_labels = round(nr_double_labels / len(df),4)
     barriers_df['label'] = labels
-    return barriers_df, barriers_df.label
+    return barriers_df, barriers_df.label, perc_double_labels
    
    
-   barriers_df, labels = get_labels_daily(data, upper_lower_multipliers(2,2))
+   barriers_df, labels, double_labels = get_labels_daily(data, (2,2))
+   print(f"Percentage of double labels: {double_labels*100}%")
